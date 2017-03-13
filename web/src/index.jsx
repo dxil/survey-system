@@ -8,15 +8,18 @@ import configure from "./store/configure";
 
 const store = configure();
 
-process.NODE_ENV === 'development'
 // 将路由更新到浏览器历史记录里
 const history = syncHistoryWithStore(hashHistory, store);
 
 render(
     <Provider store={store}>
         <Router history={history}>
-            <Router path="/" component={App}>
-            </Router>
+            <Route path="/" component={App}>
+                {/*<IndexRoute component={App} />*/}
+                {/*<Route path="edit" component={App} />*/}
+                {/*<Route path="fill" component={App} />*/}
+                {/*<Route path="check" component={App} />*/}
+            </Route>
         </Router>
     </Provider>,
     document.getElementById("root")
