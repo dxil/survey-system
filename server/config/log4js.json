@@ -1,0 +1,36 @@
+{
+    "appenders": [
+        {
+            "type": "clustered",
+            "appenders": [
+                {
+                    "type":"console"
+                },
+                {
+                    "type": "dateFile",
+                    "filename": "./storage/logs/http/access.log",
+                    "pattern" : ".yyyy-MM-dd",
+                    "category": "http"
+                },
+                {
+                    "type": "file",
+                    "filename": "./storage/logs/app.log",
+                    "maxLogSize": 20480000,
+                    "backups": 100,
+                    "category"  : "app"
+                },
+                {
+                    "type": "logLevelFilter",
+                    "level": "ERROR",
+                    "appender": {
+                        "type": "file",
+                        "filename": "./storage/logs/errors.log",
+                        "maxLogSize": 20480000,
+                        "backups" : 100,
+                        "category": "error"
+                    }
+                }
+            ]
+        }
+    ]
+}
