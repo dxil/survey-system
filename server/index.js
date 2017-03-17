@@ -41,7 +41,6 @@ app.use(session({
 
 
 // db connections , switch to config
-mongoose.Promise = global.Promise
 mongoose.connect(configs[process.env.NODE_ENV]['db']);
 mongoose.connection.on('connected', function () {
     console.log('!--- MongoDB Connection success ---!');
@@ -49,7 +48,7 @@ mongoose.connection.on('connected', function () {
 
 if ('development' === app.get('env')) {
     app.set('showStackError', true);
-    // app.use(log4js.connectLogger(log4js.getLogger("http"), { level: 'auto' }));
+    app.use(log4js.connectLogger(log4js.getLogger("http"), { level: 'auto' }));
     app.locals.pretty = true;
     mongoose.set('debug', true);
 }

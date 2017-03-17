@@ -13,20 +13,20 @@ module.exports = function(app){
     //     next()
     // })
 
-    // app.use(function(req , res , next){
-    //
-    //     var body = req.body;
-    //
-    //     var method = "req_method : "+ req.method,
-    //         url = "req_url : " + req.path,
-    //         param = "req_params : " + JSON.stringify(body);
-    //
-    //     var log = '{'+"\r\n    "+method+"\r\n    "+url+"\r\n    "+param+"\r\n"+'}';
-    //
-    //     logger.info('Request :\r\n'+log);
-    //
-    //     next();
-    // });
+    app.use(function(req , res , next){
+
+        var body = req.body;
+
+        var method = "req_method : "+ req.method,
+            url = "req_url : " + req.path,
+            param = "req_params : " + JSON.stringify(body);
+
+        var log = '{'+"\r\n    "+method+"\r\n    "+url+"\r\n    "+param+"\r\n"+'}';
+
+        logger.info('Request :\r\n'+log);
+
+        next();
+    });
 
     // //user router
     var user = require('../app/controller/user/user');

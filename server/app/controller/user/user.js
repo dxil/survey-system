@@ -48,18 +48,10 @@ exports.signin = function(req, res) {
 // logout
 exports.logout = function(req, res) {
     delete req.session.user
-    // res.redirect('/signin')
 }
 
 exports.signup = function(req, res) {
-    console.log(req.body);
-    var __user = {
-        name: req.body.name,
-        password: req.body.password
-    }
-    var _user = __user
-    var UserSchema = new User(_user)
-
+    var _user = req.body.user
     User.findOne({name: _user.name}, function(err, user){
         if(err) {
             console.log(err)
@@ -72,7 +64,8 @@ exports.signup = function(req, res) {
                 'msg': '用户已存在'
             })
         }else {
-            UserSchema.save(function(err, user) {
+            var user = new User(_user)
+            user.save(function(err, user) {
                 if (err) {
                     console.log(err)
                 }
