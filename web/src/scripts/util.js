@@ -26,3 +26,22 @@ export const cloneObject = (src) => {
     }
     return tar;
 };
+
+export const testOptions = (props, propName, componentName) => {
+    if (props.type !== TEXT
+        && !(props.options && isArray(props.options) && props.options.every((option) => typeof option === "string"))) {
+        return new Error(`Invalid prop '${propName}' supplied to ${componentName}. Validation failed.`);
+    }
+};
+
+export const testIsRequired = (props, propName, componentName) => {
+    if (props.type === TEXT && typeof props.isRequired !== "boolean") {
+        return new Error(`Invalid prop '${propName}' supplied to ${componentName}. Validation failed.`);
+    }
+};
+
+export const testIndex = (props, propName, componentName) => {
+    if (!(isInteger(props[propName]) && props[propName] >= -1)) {
+        return new Error(`Invalid prop '${propName}' supplied to ${componentName}. Validation failed.`);
+    }
+};

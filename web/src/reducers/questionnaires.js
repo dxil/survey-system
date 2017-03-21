@@ -35,6 +35,31 @@ const questionnaires = handleActions({
         const editing = { ...cloneObject(initialEditing), questionnaire, title, time, questions };
         return Object.assign({}, state, { editing });
     },
+    [Types.EDIT_TEXT](state, action) {
+        const { editing } = state;
+        const { content, question, option } = action.payload;
+        console.log(state);
+        console.log(action);
+        if (question !== -1 && option !== -1 && editing.questions[question].type === TEXT) {
+            editing.questions[question].content = content;
+            return Object.assign({}, state, { editing });
+        }
+        else {
+            console.log('typing');
+            return Object.assign({}, state, { editing: { ...editing, question, option, text: { typing: true, content } } });
+        }
+    },
+    [Types.SAVE_TEXT](state, action) {
+        const { editing } = state;
+        const { questionnaire, question, option } = editing;
+        const content = action.payload;
+        switch (true) {
+            case question === -1: editing.title = content; break;
+            case option === -1: editing.questions[question].content = content; break
+            default: editing.questions[question].options[option] = content;
+        }
+        return Object.assign({}, state, { editing: { ...editing, question: -1, option: -1, text: { typing: false, content: ""} } });
+    }
 }, initialState);
 
 export default questionnaires;

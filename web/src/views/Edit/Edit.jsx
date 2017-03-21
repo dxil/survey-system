@@ -1,14 +1,16 @@
-import React, { Component, PropTypes } from "react";
-import { bindActionCreators } from "redux";
-import { connect } from "react-redux";
-import { Link } from "react-router";
-import classNames from "classnames";
+import React, { Component, PropTypes } from 'react';
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import { Link } from 'react-router';
+import classNames from 'classnames';
+import { isArray, isInteger, testIndex, testOptions, testIsRequired } from '../../scripts/util';
+import { Input, Dialog } from "../../components";
 import * as QuestionnaireActions from "../../actions/questionnaires";
 import * as DialogActions from "../../actions/dialog";
-import { testIndex, testOptions, testIsRequired } from '../../scripts/util';
-import { UNRELEASED, RELEASED, CLOSED } from "../../constants/QuestionnaireStatusTypes";
 import { RADIO, CHECKBOX, TEXT } from "../../constants/QuestionTypes";
-import styles from './Home.scss'
+import { UNRELEASED, RELEASED, CLOSED } from "../../constants/QuestionnaireStatusTypes";
+import styles from "./Edit.scss";
 
 const mapStateToProps = state => ({
     questionnaires: state.questionnaires,
@@ -23,7 +25,7 @@ const mapDispatchToProps = dispatch => ({
 });
 
 @connect(mapStateToProps, mapDispatchToProps)
-class Home extends Component {
+class Edit extends Component {
     static propTypes = {
         questionnaires: PropTypes.shape({
             list: PropTypes.arrayOf(PropTypes.shape({
@@ -71,60 +73,72 @@ class Home extends Component {
             status: PropTypes.oneOf([0, 1, 2, 3]).isRequired,
             id: PropTypes.string.isRequired
         }).isRequired,
+        calendar: PropTypes.object.isRequired,
         actions: PropTypes.shape({
-            addQuestionnaire: PropTypes.func.isRequired,
-            editQuestionnaire: PropTypes.func.isRequired,
-            removeQuestionnaire: PropTypes.func.isRequired,
-            sortQuestionnaire: PropTypes.func.isRequired,
-            fillQuestionnaire: PropTypes.func.isRequired,
+            editText: PropTypes.func.isRequired,
+            saveText: PropTypes.func.isRequired,
+            chooseType: PropTypes.func.isRequired,
+            addQuestion: PropTypes.func.isRequired,
+            removeQuestion: PropTypes.func.isRequired,
+            shiftQuestion: PropTypes.func.isRequired,
+            copyQuestion: PropTypes.func.isRequired,
+            addOption: PropTypes.func.isRequired,
+            removeOption: PropTypes.func.isRequired,
+            toggleRequirement: PropTypes.func.isRequired,
+            saveQuestionnaire: PropTypes.func.isRequired,
+            releaseQuestionnaire: PropTypes.func.isRequired,
             switchDialog: PropTypes.func.isRequired
         }).isRequired
     };
     constructor(props) {
         super(props);
-        this.handleAddQuestionnaire = this.handleAddQuestionnaire.bind(this);
-        this.handleEditQuestionnaire = this.handleEditQuestionnaire.bind(this);
-    };
-    componentWillMount() {
-        console.log('-----componentWillMount-----')
-        const { questionnaires: { list }} = this.props;
-        console.log(list);
-        const now = new Date().getTime() - 86400000;
-        list.forEach((questionnaire, questionnaireIndex) =>
-            questionnaire.status === RELEASED && questionnaire.time < now
-        );
-    };
-    componentDidMount() {
-    };
-    handleAddQuestionnaire() {
-        console.log('-----Handle-----')
-        const { addQuestionnaire } = this.props.actions;
-        addQuestionnaire();
-    };
-    handleEditQuestionnaire() {
-        console.log('-----Edit-----')  ;
-        const { editQuestionnaire } = this.props.actions;
-        return event => editQuestionnaire(questionnaire);
-    };
-    render() {
-        const { questionnaires: { list }, dialog } = this.props;
-        return list.length ? (
-            <div>
-
-            </div>
-        ) : (
-            <div className={styles.wrap}>
-                <Link to="/edit" className={styles.link}>
-                    <div
-                        className={styles["add-btn"]}
-                        onClick={this.handleAddQuestionnaire}
-                    >
-                        <span>新建问卷</span>
-                    </div>
-                </Link>
-            </div>
-        );
     }
+    handleEditText(question, option, content) {
+        const { editText } = this.props.actions;
+        console.log('edit');
+        return event => editText(content || event.target.value, question, option);
+    }
+    handleSaveText(event) {
+        const { saveText } = this.props.actions;
+        console.log('save');
+    }
+    renderQuestionnaireTitle() {
+        const { questionnaires: { editing } } = this.props;
+        console.log('title');
+        console.log(editing);
+        if(editing.text.typing && editing.question === -1 && editing.option === -1) {
+            return (
+                <Input
+                    content={editing.text.content}
+                    className={styles["edit-questionnaire-title"]}
+                    onEdit={this.handleEditText(-1, -1)}
+                    onSave={this.handleSaveText}
+                />
+            );
+        }
+        else {
+            const title = editing.title;
+            return (
+                <h1
+                    className={styles["questionnaire-title"]}
+                    onClick={this.handleEditText(-1, -1, title)}
+                >
+                    {title}
+                </h1>
+            );
+        }
+    }
+    render() {
+        const { questionnaires: { editing }, dialog, actions: { switchDialog } } = this.props;
+        const time = new Date(editing.time);
+        const [year, month, date] = [time.getFullYear(), time.getMonth() + 1, time.getDate()];
+        return(
+            <div>
+                {this.renderQuestionnaireTitle()}
+            </div>
+        )
+    }
+
 }
 
-export default Home
+export default Edit;
