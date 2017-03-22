@@ -142,3 +142,13 @@ class Edit extends Component {
 }
 
 export default Edit;
+
+/*
+* 问卷建立过程
+* 1.点击添加问题 调用 handleChooseType Function 来调用chooseType Action改变type => true
+* 2.renderTypes 订阅了state type 的变化，接受到true后自动展现选择文本框
+* 3.点击类型后调用handleAddQuestion Function  内部调用foreach来查询点击的方法并调用addQuestion Action 来传入默认的参数
+* 4.renderQuestions Function 中监控了editting.questions 的长度 添加问卷
+* 5.
+*
+* */
