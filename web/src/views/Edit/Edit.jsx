@@ -149,6 +149,13 @@ export default Edit;
 * 2.renderTypes 订阅了state type 的变化，接受到true后自动展现选择文本框
 * 3.点击类型后调用handleAddQuestion Function  内部调用foreach来查询点击的方法并调用addQuestion Action 来传入默认的参数
 * 4.renderQuestions Function 中监控了editting.questions 的长度 添加问卷
-* 5.
-*
+* 5.内部调用renderQuestionContent Function 取得问题的题目 点击 其中的content 触发handleEditText Function
+*   5.1 传入的question -1 用来标识这是改变第几个question的标题
+*   5.2 handleEditText 调用editText Action 来更改当前editing的typing为true
+*   5.3 当前renderQuestionContent Function中同样监听了text的typing的属性 于是div => input 并监听edit save方法 同时最后改typing为FALSE
+* 6.renderOption 方法流程类似
+* 7.移除Option单纯splice
+* 8.当问题为文本题时可以选择是否必答该问题，用到toogleOption Action 操作!!(editing.questions[question].isRequired ^ 1) ^ 异或操作 取反 !!确保返回预期的Boolean值
+* 9.上下移动问题用到shiftQuestion Action editing.questions.splice(question + direction, 0, editing.questions.splice(question, 1)[0]);
+* 10.
 * */

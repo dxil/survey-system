@@ -39,6 +39,7 @@ app.use(session({
     })
 }));
 
+console.log('server listen at localhost://'+ PORT);
 
 // db connections , switch to config
 mongoose.connect(configs[process.env.NODE_ENV]['db']);
