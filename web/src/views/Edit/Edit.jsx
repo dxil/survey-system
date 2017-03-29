@@ -92,6 +92,18 @@ class Edit extends Component {
     };
     constructor(props) {
         super(props);
+        this.handleEditText = this.handleEditText.bind(this);
+        this.handleSaveText = this.handleSaveText.bind(this);
+        // this.handleChooseType = this.handleChooseType.bind(this);
+        // this.handleAddQuestion = this.handleAddQuestion.bind(this);
+        // this.handleRemoveQuestion = this.handleRemoveQuestion.bind(this);
+        // this.handleShiftQuestion = this.handleShiftQuestion.bind(this);
+        // this.handleCopyQuestion = this.handleCopyQuestion.bind(this);
+        // this.handleAddOption = this.handleAddOption.bind(this);
+        // this.handleRemoveOption = this.handleRemoveOption.bind(this);
+        // this.handleToggleRequirement = this.handleToggleRequirement.bind(this);
+        // this.handleSaveQuestionnaire = this.handleSaveQuestionnaire.bind(this);
+        // this.handleReleaseQuestionnaire = this.handleReleaseQuestionnaire.bind(this);
     }
     handleEditText(question, option, content) {
         const { editText } = this.props.actions;
@@ -101,6 +113,7 @@ class Edit extends Component {
     handleSaveText(event) {
         const { saveText } = this.props.actions;
         console.log('save');
+        saveText(event.target.value.trim());
     }
     renderQuestionnaireTitle() {
         const { questionnaires: { editing } } = this.props;
@@ -128,6 +141,56 @@ class Edit extends Component {
             );
         }
     }
+    renderQuestionContent(question) {
+        const { questionnaires: { editing } } = this.props;
+        if (editing.text.typing && editing.question === question && editing.option === -1) {
+            return (
+                <Input
+                    content={editing.text.content}
+                    className={styles["edit-question-content"]}
+                    onEdit={this.handleEditText(editing.question, -1)}
+                    onSave={this.handleSaveText}/>
+            );
+        }
+        else {
+            const { type } = editing.questions[question];
+            if (type === TEXT) {
+                return (
+                    <div className={styles["question-content"]}>
+                        <span>{`${TEXT}题`}</span>
+                    </div>
+                );
+            }
+            else {
+                const { content } = editing.questions[question];
+                return (
+                    <div
+                        className={styles["question-content"]}
+                        onClick={this.handleEditText(question, -1, content)}
+                    >
+                        {content}
+                    </div>
+                );
+            }
+        }
+    }
+    renderQuestions() {
+        const { questionnaires: {editing} } = this.props;
+        const last = editing.questions.length - 1;
+        return (
+            editing.questions.map((question, questionIndex) =>
+                <div
+                    key={questionIndex}
+                    className={styles.question}
+                >
+                    <div className={styles.caption}>
+                        <span>{`Q${questionIndex + 1}`}</span>
+                        {this.renderQuestionContent(questionIndex)}
+                    </div>
+                </div>
+            )
+        )
+    }
     render() {
         const { questionnaires: { editing }, dialog, actions: { switchDialog } } = this.props;
         const time = new Date(editing.time);
@@ -135,6 +198,10 @@ class Edit extends Component {
         return(
             <div>
                 {this.renderQuestionnaireTitle()}
+                <hr className={styles.line}/>
+                <div className={styles["question-wrap"]}>
+                    {this.renderQuestions()}
+                </div>
             </div>
         )
     }
