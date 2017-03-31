@@ -94,8 +94,8 @@ class Edit extends Component {
         super(props);
         this.handleEditText = this.handleEditText.bind(this);
         this.handleSaveText = this.handleSaveText.bind(this);
-        // this.handleChooseType = this.handleChooseType.bind(this);
-        // this.handleAddQuestion = this.handleAddQuestion.bind(this);
+        this.handleChooseType = this.handleChooseType.bind(this);
+        this.handleAddQuestion = this.handleAddQuestion.bind(this);
         // this.handleRemoveQuestion = this.handleRemoveQuestion.bind(this);
         // this.handleShiftQuestion = this.handleShiftQuestion.bind(this);
         // this.handleCopyQuestion = this.handleCopyQuestion.bind(this);
@@ -114,6 +114,30 @@ class Edit extends Component {
         const { saveText } = this.props.actions;
         console.log('save');
         saveText(event.target.value.trim());
+    }
+    handleChooseType() {
+        const { chooseType } = this.props.actions;
+        chooseType();
+    }
+    handleAddQuestion(event) {
+        const { chooseType, addQuestion } = this.props.actions;
+        chooseType();
+        [RADIO, CHECKBOX, TEXT].forEach((element) => event.target === this.refs[element] && addQuestion(element))
+    }
+    renderTypes() {
+        const { questionnaires: { editing: { type } } } = this.props;
+        if (type) {
+            return (
+                <div
+                    className={styles["type-wrap"]}
+                    onClick={this.handleAddQuestion}
+                >
+                    <div ref={RADIO} className={classNames(styles.type, styles.radio)}>{RADIO}</div>
+                    <div ref={CHECKBOX} className={classNames(styles.type, styles.checkbox)}>{CHECKBOX}</div>
+                    <div ref={TEXT} className={classNames(styles.type, styles.text)}>{TEXT}</div>
+                </div>
+            );
+        }
     }
     renderQuestionnaireTitle() {
         const { questionnaires: { editing } } = this.props;
@@ -201,6 +225,28 @@ class Edit extends Component {
                 <hr className={styles.line}/>
                 <div className={styles["question-wrap"]}>
                     {this.renderQuestions()}
+                </div>
+                <div className={styles["add-question"]}>
+                    <ReactCSSTransitionGroup
+                        transitionName={styles}
+                        transitionEnterTimeout={300}
+                        transitionLeaveTimeout={300}
+                    >
+                        {this.renderTypes()}
+                    </ReactCSSTransitionGroup>
+                    <div
+                        className={styles["add-question-btn"]}
+                        onClick={this.handleChooseType}
+                    >
+                        <span>添加问题</span>
+                    </div>
+                </div>
+                <hr className={styles.line}/>
+                <div className={styles.footer}>
+                    <div className={styles["date-wrap"]}>
+                        <span>问卷截止日期</span>
+                        {/*{this.render}*/}
+                    </div>
                 </div>
             </div>
         )

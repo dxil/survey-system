@@ -59,6 +59,24 @@ const questionnaires = handleActions({
             default: editing.questions[question].options[option] = content;
         }
         return Object.assign({}, state, { editing: { ...editing, question: -1, option: -1, text: { typing: false, content: ""} } });
+    },
+    [Types.CHOOSE_TYPE](state, action) {
+        const { editing } = state;
+        const type = !!(editing.type ^ 1);
+        return Object.assign({}, state, { editing: { ...editing, type } });
+    },
+    [Types.ADD_QUESTION](state, action) {
+        const { editing } = state;
+        const type = action.payload;
+        let question;
+        switch (type) {
+            case RADIO: question = { type, content: "单选题", options: ["选项1", "选项2"] }; break;
+            case CHECKBOX: question = { type, content: "多选题", options: ["选项1", "选项2", "选项3", "选项4"] }; break;
+            case TEXT: question = { type, content: "", isRequired: false }; break;
+            default: question = {};
+        }
+        editing.questions.push(question);
+        return Object.assign({}, state, { editing });
     }
 }, initialState);
 
