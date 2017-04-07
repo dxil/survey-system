@@ -99,9 +99,9 @@ class Edit extends Component {
         // this.handleRemoveQuestion = this.handleRemoveQuestion.bind(this);
         // this.handleShiftQuestion = this.handleShiftQuestion.bind(this);
         // this.handleCopyQuestion = this.handleCopyQuestion.bind(this);
-        // this.handleAddOption = this.handleAddOption.bind(this);
-        // this.handleRemoveOption = this.handleRemoveOption.bind(this);
-        // this.handleToggleRequirement = this.handleToggleRequirement.bind(this);
+        this.handleAddOption = this.handleAddOption.bind(this);
+        this.handleRemoveOption = this.handleRemoveOption.bind(this);
+        this.handleToggleRequirement = this.handleToggleRequirement.bind(this);
         // this.handleSaveQuestionnaire = this.handleSaveQuestionnaire.bind(this);
         // this.handleReleaseQuestionnaire = this.handleReleaseQuestionnaire.bind(this);
     }
@@ -123,6 +123,18 @@ class Edit extends Component {
         const { chooseType, addQuestion } = this.props.actions;
         chooseType();
         [RADIO, CHECKBOX, TEXT].forEach((element) => event.target === this.refs[element] && addQuestion(element))
+    }
+    handleAddOption(question) {
+        const { addOption } = this.props.actions;
+        return event => addOption(question);
+    }
+    handleRemoveOption(question, option) {
+        const { removeOption } = this.props.actions;
+        return event => removeOption(question, option);
+    }
+    handleToggleRequirement(question) {
+        const { toggleRequirement } = this.props.actions;
+        return event => toggleRequirement(question);
     }
     renderTypes() {
         const { questionnaires: { editing: { type } } } = this.props;
@@ -198,6 +210,27 @@ class Edit extends Component {
             }
         }
     }
+    renderOption(question, option) {
+        const { questionnaires: { editing } } = this.props;
+        if (editing.text.typing && editing.question === question && editing.option === option) {
+            return (
+                <Input
+                    content={editing.text.content}
+                    className={styles["edit-option"]}
+                    onEdit={this.handleEditText(editing.question, editing.option)}
+                    onSave={this.handleSaveText}
+                />
+            );
+        }
+        else {
+            const content = editing.questions[question].options[option];
+            return (
+                <span onClick={this.handleEditText(question, option, content)}>
+                    {content}
+                </span>
+            );
+        }
+    }
     renderQuestions() {
         const { questionnaires: {editing} } = this.props;
         const last = editing.questions.length - 1;
@@ -211,9 +244,80 @@ class Edit extends Component {
                         <span>{`Q${questionIndex + 1}`}</span>
                         {this.renderQuestionContent(questionIndex)}
                     </div>
+                    {question.type !==  TEXT ? (
+                        <div>
+                            {question.options.map((option, optionIndex) =>
+                                <div
+                                    key={optionIndex}
+                                    className={styles["option-wrap"]}
+                                >
+                                    <span className={classNames({
+                                        [styles["radio-option-icon"]]: question.type === RADIO,
+                                        [styles["checkbox-option-icon"]]: question.type === CHECKBOX
+                                    })} />
+                                    {this.renderOption(questionIndex, optionIndex)}
+                                    <span
+                                        className={styles["remove-option-btn"]}
+                                        onClick={this.handleRemoveOption(questionIndex, optionIndex)}
+                                    />
+                                </div>
+                            )}
+                            <div
+                                className={styles["add-option-btn"]}
+                                onClick={this.handleAddOption(questionIndex)}
+                            />
+                        </div>
+                    ) : (
+                        <div>
+                            <textarea
+                                value={question.content}
+                                className={styles.text}
+                                onChange={this.handleEditText(questionIndex, 0)}
+                            />
+                            <div
+                                className={classNames({
+                                    [styles.required]: question.isRequired,
+                                    [styles["not-required"]]: !question.isRequired
+                                })}
+                                onClick={this.handleToggleRequirement(questionIndex)}
+                            >
+                                <span>此题是否必填</span>
+                            </div>
+                        </div>
+                    )}
+                    <div className={styles["operation-wrap"]}>
+                        {questionIndex > 0 && (
+                            <div
+                                className={styles.operation}
+                                onClick={this.handleShiftQuestion(questionIndex, -1)}
+                            >
+                                <span>上移</span>
+                            </div>
+                        )}
+                        {questionIndex < last && (
+                            <div
+                                className={styles.operation}
+                                onClick={this.handleShiftQuestion(questionIndex, 1)}
+                            >
+                                <span>下移</span>
+                            </div>
+                        )}
+                        <div
+                            className={styles.operation}
+                            onClick={this.handleCopyQuestion(questionIndex)}
+                        >
+                            <span>复用</span>
+                        </div>
+                        <div
+                            className={styles.operation}
+                            onClick={this.handleRemoveQuestion(questionIndex)}
+                        >
+                            <span>删除</span>
+                        </div>
+                    </div>
                 </div>
             )
-        )
+        );
     }
     render() {
         const { questionnaires: { editing }, dialog, actions: { switchDialog } } = this.props;

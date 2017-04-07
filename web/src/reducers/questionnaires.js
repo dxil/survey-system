@@ -77,7 +77,25 @@ const questionnaires = handleActions({
         }
         editing.questions.push(question);
         return Object.assign({}, state, { editing });
-    }
+    },
+    [Types.ADD_OPTION](state, action) {
+        const { editing } = state;
+        const question = action.payload;
+        editing.questions[question].options.push(`选项${editing.questions[question].options.length + 1}`);
+        return Object.assign({}, state, { editing });
+    },
+    [Types.REMOVE_OPTION](state, action) {
+        const { editing } = state;
+        const { question, option } = action.payload;
+        editing.questions[question].options.splice(option, 1);
+        return Object.assign({}, state, { editing });
+    },
+    [Types.TOGGLE_REQUIREMENT](state, action) {
+        const { editing } = state;
+        const question = action.payload;
+        editing.questions[question].isRequired = !!(editing.questions[question].isRequired ^ 1);
+        return Object.assign({}, state, { editing });
+    },
 }, initialState);
 
 export default questionnaires;
