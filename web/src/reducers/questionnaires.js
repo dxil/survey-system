@@ -96,6 +96,19 @@ const questionnaires = handleActions({
         editing.questions[question].isRequired = !!(editing.questions[question].isRequired ^ 1);
         return Object.assign({}, state, { editing });
     },
+    [Types.SAVE_QUESTIONNAIRE](state, action) {
+        const { list, editing: { questionnaire, title, time, questions } } = state;
+        console.log(state)
+        list[questionnaire] = { title, time, status: UNRELEASED, questions: cloneObject(questions), data: [] };
+        localStorage.list = JSON.stringify(list);
+        return Object.assign({}, state, { list });
+    },
+    [Types.RELEASE_QUESTIONNAIRE](state, action) {
+        const { list, editing: { questionnaire } } = state;
+        list[questionnaire].status = RELEASED;
+        localStorage.list = JSON.stringify(list);
+        return Object.assign({}, state, { list, editing: cloneObject(initialEditing) });
+    }
 }, initialState);
 
 export default questionnaires;

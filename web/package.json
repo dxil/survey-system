@@ -4,7 +4,7 @@
   "description": "survey-system",
   "main": "index.jsx",
   "scripts": {
-    "dev": "webpack-dev-server -d --history-api-fallback --hot --inline --progress --colors --port 3000",
+    "dev": "webpack-dev-server -d --history-api-fallback --hot --inline --progress --colors --port 3002",
     "build": "NODE_ENV=production && webpack --progress --colors"
   },
   "repository": {

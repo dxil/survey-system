@@ -96,14 +96,14 @@ class Edit extends Component {
         this.handleSaveText = this.handleSaveText.bind(this);
         this.handleChooseType = this.handleChooseType.bind(this);
         this.handleAddQuestion = this.handleAddQuestion.bind(this);
-        // this.handleRemoveQuestion = this.handleRemoveQuestion.bind(this);
-        // this.handleShiftQuestion = this.handleShiftQuestion.bind(this);
-        // this.handleCopyQuestion = this.handleCopyQuestion.bind(this);
+        this.handleRemoveQuestion = this.handleRemoveQuestion.bind(this);
+        this.handleShiftQuestion = this.handleShiftQuestion.bind(this);
+        this.handleCopyQuestion = this.handleCopyQuestion.bind(this);
         this.handleAddOption = this.handleAddOption.bind(this);
         this.handleRemoveOption = this.handleRemoveOption.bind(this);
         this.handleToggleRequirement = this.handleToggleRequirement.bind(this);
-        // this.handleSaveQuestionnaire = this.handleSaveQuestionnaire.bind(this);
-        // this.handleReleaseQuestionnaire = this.handleReleaseQuestionnaire.bind(this);
+        this.handleSaveQuestionnaire = this.handleSaveQuestionnaire.bind(this);
+        this.handleReleaseQuestionnaire = this.handleReleaseQuestionnaire.bind(this);
     }
     handleEditText(question, option, content) {
         const { editText } = this.props.actions;
@@ -135,6 +135,56 @@ class Edit extends Component {
     handleToggleRequirement(question) {
         const { toggleRequirement } = this.props.actions;
         return event => toggleRequirement(question);
+    }
+    handleShiftQuestion(question, direction) {
+        const { shiftQuestion } = this.props.actions;
+        return event => shiftQuestion(question, direction);
+    }
+    handleCopyQuestion(question) {
+        const { copyQuestion } = this.props.actions;
+        return event => copyQuestion(question)
+    }
+    handleRemoveQuestion(question) {
+        const { removeQuestion } = this.props.actions;
+        return envent => removeQuestion(question);
+    }
+    handleSaveQuestionnaire(event) {
+        console.log(this.props)
+        const { dialog: { status }, actions: { saveQuestionnaire, switchDialog } } = this.props;
+        const id = "save-btn";
+        if (status ^ 1 && status ^ 3) {
+            if (event.target === this.refs[id]) {
+                saveQuestionnaire();
+                switchDialog(id);
+                setTimeout(() => switchDialog(id), 290);
+            }
+            else if (status === 2) {
+                switchDialog(id);
+                setTimeout(() => switchDialog(id), 290);
+            }
+        }
+    }
+    handleReleaseQuestionnaire(event) {
+        const { dialog: { status }, actions: { releaseQuestionnaire, saveQuestionnaire, switchDialog } } = this.props;
+        const id = "release-btn";
+        if (status ^ 1 && status ^ 3) {
+            if (event.target === this.refs[id]) {
+                switchDialog(id);
+                setTimeout(() => switchDialog(id), 290)
+            }
+            else if (status === 2) {
+                if (event.target === this.refs["confirm-btn"]) {
+                    saveQuestionnaire();
+                    releaseQuestionnaire();
+                    switchDialog("");
+                    switchDialog("");
+                }
+                else {
+                    switchDialog(id);
+                    setTimeout(() => switchDialog(id), 290);
+                }
+            }
+        }
     }
     renderTypes() {
         const { questionnaires: { editing: { type } } } = this.props;
@@ -351,6 +401,41 @@ class Edit extends Component {
                         <span>问卷截止日期</span>
                         {/*{this.render}*/}
                     </div>
+                    <input
+                        ref="save-btn"
+                        type="button"
+                        value="保存问卷"
+                        className={styles.btn}
+                        onClick={this.handleSaveQuestionnaire}
+                    />
+                    <input
+                        ref="release-btn"
+                        type="button"
+                        value="发布问卷"
+                        className={styles.btn}
+                        onClick={this.handleReleaseQuestionnaire}
+                    />
+                    <Dialog
+                        dialog={dialog}
+                        self={this}
+                        id={"save-btn"}
+                        onLeave={this.handleSaveQuestionnaire}
+                        title={"提示"}
+                    >
+                        <div className={styles.dialog}>
+                            <div>
+                                <p>{`问卷已保存。`}</p>
+                            </div>
+                            <div className={styles["btn-wrap"]}>
+                                <input
+                                    type="button"
+                                    value="确定"
+                                    className={styles.btn}
+                                    onClick={this.handleSaveQuestionnaire}
+                                />
+                            </div>
+                        </div>
+                    </Dialog>
                 </div>
             </div>
         )
