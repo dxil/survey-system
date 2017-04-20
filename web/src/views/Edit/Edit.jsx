@@ -186,6 +186,12 @@ class Edit extends Component {
             }
         }
     }
+    isLegal() {
+        const { questionnaires: { editing: { title, time, questions } } } = this.props;
+        return title && new Date(time).getFullYear() !== 1970 && questions.length && questions.every(question =>
+                question.content && (question.type === TEXT || question.options.length > 1 && question.options.every(option => option))
+            );
+    }
     renderTypes() {
         const { questionnaires: { editing: { type } } } = this.props;
         if (type) {
@@ -436,9 +442,56 @@ class Edit extends Component {
                             </div>
                         </div>
                     </Dialog>
+                    <Dialog
+                        dialog={dialog}
+                        self={this}
+                        id={"release-btn"}
+                        onLeave={this.handleReleaseQuestionnaire}
+                        title={"提示"}
+                    >
+                        {this.isLegal() ? (
+                            <div className={styles.dialog}>
+                                <div>
+                                    <p>{`是否发布问卷？`}</p>
+                                    <p>{`（本问卷截止日期为${year}-${month}-${date}）`}</p>
+                                </div>
+                                <div className={styles["btn-wrap"]}>
+                                    <Link to="/" className={styles.link}>
+                                        <input
+                                            ref="confirm-btn"
+                                            type="button"
+                                            value="确定"
+                                            className={styles.btn}
+                                            onClick={this.handleReleaseQuestionnaire}
+                                        />
+                                    </Link>
+                                    <input
+                                        type="button"
+                                        value="取消"
+                                        className={styles.btn}
+                                        onClick={this.handleReleaseQuestionnaire}
+                                    />
+                                </div>
+                            </div>
+                        ) : (
+                            <div className={styles.dialog}>
+                                <div>
+                                    <p>{year === 1970 ? `请设置问卷截止日期。` : `请合理设置问卷内容。`}</p>
+                                </div>
+                                <div className={styles["btn-wrap"]}>
+                                    <input
+                                        type="button"
+                                        value="确定"
+                                        className={styles.btn}
+                                        onClick={this.handleReleaseQuestionnaire}
+                                    />
+                                </div>
+                            </div>
+                        )}
+                    </Dialog>
                 </div>
             </div>
-        )
+        );
     }
 
 }
